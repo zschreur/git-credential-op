@@ -2,12 +2,10 @@ use clap::{Parser, Subcommand};
 use std::io::{self, Write};
 use std::process::Command;
 
+mod conf;
+
 #[derive(Parser, Debug)]
 struct Opt {
-    #[arg(short, long)]
-    vault: String,
-    #[arg(short, long)]
-    id: String,
     #[command(subcommand)]
     cmd: Commands,
 }
@@ -19,7 +17,7 @@ enum Commands {
     Erase,
 }
 
-fn get(vault: String, id: String) -> io::Result<()> {
+fn get(config: conf::Configuration) -> io::Result<()> {
     loop {
         let mut input = String::new();
         io::stdin().read_line(&mut input)?;
@@ -30,12 +28,12 @@ fn get(vault: String, id: String) -> io::Result<()> {
 
     let username_child = Command::new("op")
         .arg("read")
-        .arg(format!("op://{}/{}/username", vault, id))
+        .arg(format!("op://{}/{}/username", config.vault, config.id))
         .output()?;
 
     let password_child = Command::new("op")
         .arg("read")
-        .arg(format!("op://{}/{}/password", vault, id))
+        .arg(format!("op://{}/{}/password", config.vault, config.id))
         .output()?;
 
     io::stdout().write_all(b"username=")?;
@@ -46,11 +44,18 @@ fn get(vault: String, id: String) -> io::Result<()> {
     Ok(())
 }
 
-fn main() -> Result<(), io::Error> {
+#[derive(Debug)]
+enum OPGitError {
+    ConfigurationError(config::ConfigError),
+    IOError(io::Error),
+}
+
+fn main() -> Result<(), OPGitError> {
     let opt = Opt::parse();
+    let c = conf::load_configuration().map_err(OPGitError::ConfigurationError)?;
 
     match opt.cmd {
-        Commands::Get => get(opt.vault, opt.id),
+        Commands::Get => get(c).map_err(OPGitError::IOError),
         _ => Ok(()),
     }
 }
