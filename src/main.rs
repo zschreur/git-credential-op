@@ -18,14 +18,6 @@ enum Commands {
 }
 
 fn get(config: conf::Configuration) -> io::Result<()> {
-    loop {
-        let mut input = String::new();
-        io::stdin().read_line(&mut input)?;
-        if input.trim().is_empty() {
-            break;
-        }
-    }
-
     let username_child = Command::new("op")
         .arg("read")
         .arg(format!("op://{}/{}/username", config.vault, config.id))
