@@ -1,6 +1,13 @@
-use std::env;
+use clap::{Parser, Subcommand};
 
-enum Operation {
+#[derive(Parser)]
+struct Opt {
+    #[command(subcommand)]
+    cmd: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
     Get,
     Store,
     Erase,
@@ -19,16 +26,10 @@ fn get() -> std::io::Result<()> {
 }
 
 fn main() -> Result<(), std::io::Error> {
-    let args: Vec<String> = env::args().collect();
-    let op = match args.last().map(|s| s.as_str()) {
-        Some("get") => Operation::Get,
-        Some("store") => Operation::Store,
-        Some("erase") => Operation::Erase,
-        _ => panic!("Invalid operation: {}", args[1]),
-    };
+    let opt = Opt::parse();
 
-    match op {
-        Operation::Get => get(),
+    match opt.cmd {
+        Commands::Get => get(),
         _ => Ok(()),
     }
 }
