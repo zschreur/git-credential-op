@@ -5,6 +5,7 @@ use std::process::Command;
 mod conf;
 
 #[derive(Parser, Debug)]
+#[command(version, about)]
 struct Opt {
     #[command(subcommand)]
     cmd: Commands,

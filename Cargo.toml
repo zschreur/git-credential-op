@@ -1,5 +1,6 @@
 [package]
 name = "git-credential-op"
+description = "A git credential helper for 1Password"
 version = "0.1.0"
 edition = "2021"
 
