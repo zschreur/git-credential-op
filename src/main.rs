@@ -6,7 +6,19 @@ enum Operation {
     Erase,
 }
 
-fn main() {
+fn get() -> std::io::Result<()> {
+    loop {
+        let mut input = String::new();
+        std::io::stdin().read_line(&mut input)?;
+        if input.trim().is_empty() {
+            break;
+        }
+    }
+
+    Ok(())
+}
+
+fn main() -> Result<(), std::io::Error> {
     let args: Vec<String> = env::args().collect();
     let op = match args.last().map(|s| s.as_str()) {
         Some("get") => Operation::Get,
@@ -16,7 +28,7 @@ fn main() {
     };
 
     match op {
-        Operation::Get => (),
-        _ => (),
+        Operation::Get => get(),
+        _ => Ok(()),
     }
 }
