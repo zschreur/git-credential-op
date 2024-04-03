@@ -17,35 +17,30 @@ enum Commands {
     Erase,
 }
 
+fn read_field(config: &conf::Configuration, field: &str) -> io::Result<Vec<u8>> {
+    let output = Command::new("op")
+        .arg("read")
+        .arg(format!("op://{}/{}/{}", config.vault, config.id, field))
+        .output()?;
+
+    if output.status.success() {
+        io::Result::Ok(output.stdout)
+    } else {
+        io::Result::Err(io::Error::new(
+            io::ErrorKind::PermissionDenied,
+            format!("Unable to get {}", field),
+        ))
+    }
+}
+
 fn get(config: conf::Configuration) -> io::Result<()> {
-    let username_child = Command::new("op")
-        .arg("read")
-        .arg(format!("op://{}/{}/username", config.vault, config.id))
-        .output()?;
-
-    if !username_child.status.success() {
-        return io::Result::Err(io::Error::new(
-            io::ErrorKind::PermissionDenied,
-            "Unable to get username".to_string(),
-        ));
-    }
-
-    let password_child = Command::new("op")
-        .arg("read")
-        .arg(format!("op://{}/{}/password", config.vault, config.id))
-        .output()?;
-
-    if !password_child.status.success() {
-        return io::Result::Err(io::Error::new(
-            io::ErrorKind::PermissionDenied,
-            "Unable to get password".to_string(),
-        ));
-    }
+    let username = read_field(&config, "username")?;
+    let password = read_field(&config, "password")?;
 
     io::stdout().write_all(b"username=")?;
-    io::stdout().write_all(&username_child.stdout)?;
+    io::stdout().write_all(&username)?;
     io::stdout().write_all(b"password=")?;
-    io::stdout().write_all(&password_child.stdout)?;
+    io::stdout().write_all(&password)?;
 
     Ok(())
 }
