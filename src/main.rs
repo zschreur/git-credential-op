@@ -23,10 +23,24 @@ fn get(config: conf::Configuration) -> io::Result<()> {
         .arg(format!("op://{}/{}/username", config.vault, config.id))
         .output()?;
 
+    if !username_child.status.success() {
+        return io::Result::Err(io::Error::new(
+            io::ErrorKind::PermissionDenied,
+            "Unable to get username".to_string(),
+        ));
+    }
+
     let password_child = Command::new("op")
         .arg("read")
         .arg(format!("op://{}/{}/password", config.vault, config.id))
         .output()?;
+
+    if !password_child.status.success() {
+        return io::Result::Err(io::Error::new(
+            io::ErrorKind::PermissionDenied,
+            "Unable to get password".to_string(),
+        ));
+    }
 
     io::stdout().write_all(b"username=")?;
     io::stdout().write_all(&username_child.stdout)?;

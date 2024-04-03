@@ -1,5 +1,5 @@
 [package]
-name = "op_git"
+name = "git-credential-op"
 version = "0.1.0"
 edition = "2021"
 
