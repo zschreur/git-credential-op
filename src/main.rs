@@ -46,6 +46,7 @@ fn get(config: conf::Configuration) -> io::Result<()> {
 }
 
 #[derive(Debug)]
+#[allow(dead_code)] // This is not dead code. It will be printed to stderr when main returns an Err
 enum OPGitError {
     ConfigurationError(config::ConfigError),
     IOError(io::Error),
