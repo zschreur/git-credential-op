@@ -47,7 +47,7 @@ fn get(config: conf::Configuration) -> io::Result<()> {
 }
 
 #[derive(Debug)]
-#[allow(dead_code)] // This is not dead code. It will be printed to stderr when main returns an Err
+#[allow(dead_code)] // This is not dead code - see https://github.com/rust-lang/rust/issues/123418
 enum OPGitError {
     ConfigurationError(config::ConfigError),
     IOError(io::Error),
